@@ -427,6 +427,66 @@ fun findAllAnagramsPattern(arr: CharArray, pattern: CharArray): List<Int> {
      
      return true
  }
+ 
+/**
+ * Problem Challenge 4
+ * Words Concatenation (hard)
+ * Given a string and a list of words, find all the starting indices of substrings in the given 
+ * string that are a concatenation of all the given words exactly once without any overlapping of words. It is given that all words are of the same length.
+ * Input: String="catfoxcat", Words=["cat", "fox"] Output: [0, 3]
+ * 	Explanation: The two substring containing both the words are "catfox" & "foxcat".
+ * Input: String="catcatfoxfox", Words=["cat", "fox"] Output: [3]
+ * 	Explanation: The only substring containing both the words is "catfox".
+ * 
+ * Time Complexity = O(N * M) where M is the total number of words (words.contains)
+ * Space Complexity = O(N + M) where N is the result and M is the chuncked String (input)
+ */
+fun wordsConcatenation(string: String, words: List<String>): List<Int> {
+    val result = mutableListOf<Int>()
+    val visited = mutableListOf<String>()
+    // break down the string
+    val wordsLength = words.getOrNull(0)
+    val input = string.chunked(wordsLength?.length ?: 0)
+    println("length=$wordsLength input=$input")
+    
+    var startWin = 0
+    var endWin = 0
+    var matched = 0
+    while(endWin < input.size) {
+        println("startWin=$startWin endWin=$endWin matched=$matched visited=$visited  result=$result")
+        
+        if(matched == words.size){
+            result.add(startWin * 3)
+            visited.removeAt(0)
+            ++startWin
+            --matched
+        } 
+        
+        if(words.contains(input[endWin])){ // O(M)
+            if(!visited.contains(input[endWin])){
+                ++matched
+            	visited.add(input[endWin])
+            } else {
+                // it has been visited before
+                visited.add(input[endWin])
+                visited.removeAt(0)
+                ++startWin
+        	}
+    	}
+        
+        ++endWin
+    }
+    
+    println("startWin=$startWin endWin=$endWin matched=$matched visited=$visited  result=$result")
+    if(matched == words.size) {
+        result.add(startWin * 3)
+            visited.removeAt(0)
+            ++startWin
+            --matched
+    } 
+    
+    return result
+} 
   
 fun main() {
     val result_1 = avgAllSubArrays(intArrayOf(1, 3, 2, 6, -1, 4, 1, 8, 2), 5)
@@ -441,6 +501,7 @@ fun main() {
     val prob_1 = permutationInString("aaacb".toCharArray(), "abc".toCharArray())
     val prob_2 = findAllAnagramsPattern("abbcabc".toCharArray(), "abc".toCharArray())
     val prob_3 = findSmallestSubStringPattern("adcad".toCharArray(), "abc".toCharArray())
+    val prob_4 = wordsConcatenation("catcatfoxfox", listOf("cat", "fox"))
     
     println("Result for avgAllSubArrays: $result_1")
     println("Result for maxSumSubArray: $result_2 = ${result_2.sum()}")
@@ -453,4 +514,5 @@ fun main() {
     println("Result for permutationInString: $prob_1")
     println("Result for findAllAnagramsPattern: $prob_2")
     println("Result for findSmallestSubStringPattern: $prob_3")
+    println("Result for wordsConcatenation: $prob_4")
 }
