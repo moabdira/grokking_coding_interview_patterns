@@ -311,4 +311,166 @@ fun dutchNationalFlag(arr: IntArray): IntArray{
     return arr
 } 
 
+/**
+ * Problem Challenge 1 - Quadruple Sum to Target (medium)
+ * Given an array of unsorted numbers and a target number, find all unique quadruplets in it, 
+ * whose sum is equal to the target number.
+ * 
+ * Input: [4, 1, 2, -1, 1, -3], target=1 Output: [-3, -1, 1, 4], [-3, 1, 1, 2]
+ * 	Explanation: Both the quadruplets add up to the target.
+ * Input: [2, 0, -1, 1, -2, 2], target=2 Output: [-2, 0, 2, 2], [-1, 0, 1, 2]
+ * 	Explanation: Both the quadruplets add up to the target.
+ */ 
+private fun findQuadruple(arr: IntArray, i: Int, j: Int, target: Int, result: MutableSet<List<Int>>) {
+    var k = j + 1; var l = arr.size - 1
+    while(k < l) {
+        var sum = arr[i] + arr[j] + arr[k] + arr[l]
+        //println("(${arr[i]}, ${arr[j]}, ${arr[k]}, ${arr[l]}) = $sum")
+        
+        if(sum == target) {
+            result.add(listOf(arr[i], arr[j], arr[k], arr[l]))
+            ++k
+        } else if(sum < target)
+        	++k
+        else
+        	--l
+    }
+}
+fun findAllUniqueQuadruplets(arr: IntArray, target: Int): MutableSet<List<Int>> {
+    var result = mutableSetOf<List<Int>>()
+    Arrays.sort(arr)
+    
+    for(i in arr.indices) {
+        var j = i + 1
+        
+        while(j < arr.size - 2){
+            if(arr[j] == arr[j - 1]) { ++j; continue } // skip duplicates
+            
+            findQuadruple(arr, i, j, target, result)
+            ++j
+        }
+    }
+    
+    return result
+} 
 
+/**
+ * Problem Challenge 2: Comparing Strings containing Backspaces (medium)
+ * Given two strings containing backspaces (identified by the character ‘#’), 
+ * check if the two strings are equal.
+ * 
+ * Input: str1="xy#z", str2="xzz#" Output: true
+ * 	Explanation: After applying backspaces the strings become "xz" and "xz" respectively.
+ * 
+ * Input: str1="xy#z", str2="xyz#" Output: false
+ * 	Explanation: After applying backspaces the strings become "xz" and "xy" respectively.
+ * 
+ * Input: str1="xp#", str2="xyz##" Output: true
+ * 	Explanation: After applying backspaces the strings become "x" and "x" respectively.
+ * 	In "xyz##", the first '#' removes the character 'z' and the second '#' removes the character 'y'
+ * 
+ * Input: str1="xywrrmp", str2="xywrrmu#p"	Output: true
+ * 	Explanation: After applying backspaces the strings become "xywrrmp" and "xywrrmp" respectively.
+ */ 
+private fun applyBackspaces(arr: CharArray): String {
+    var pt2 = 0; var pt1 = -1
+    while(pt2 < arr.size){
+        if(arr[pt2] != '#')
+        	pt1 = pt2
+        
+        if(arr[pt2] == '#' && pt1 >= 0){
+            arr[pt1] = '#'
+            --pt1 // keep track of the previous non-space
+        } 
+        
+        //arr.forEach{ print("$it, ") }; println()	
+        ++pt2
+    }
+    
+    // get rid of spaces
+    val stringBuilder = StringBuilder()
+    arr.forEach{ if(it != '#') stringBuilder.append(it) }
+    return stringBuilder.toString()
+} 
+fun applyBackspaces(str1: String, str2: String): Boolean {
+    // transform these strings into char list
+    var char1 = str1.toCharArray()
+    var char2 = str2.toCharArray()
+    
+    val str1_ = applyBackspaces(char1)
+    val str2_ = applyBackspaces(char2)
+    
+    //println("str1=$str1_ str2=$str2_")
+    
+    return if(str1_ == str2_) true else false
+} 
+
+/**
+ * Problem Challenge 3 - Minimum Window Sort (medium)
+ * Given an array, find the length of the smallest subarray in it which when sorted will sort 
+ * the whole array.
+ * 
+ * Input: [1, 2, 5, 3, 7, 10, 9, 12] Output: 5
+ * 	Explanation: We need to sort only the subarray [5, 3, 7, 10, 9] to make the whole array sorted
+ * Input: [1, 3, 2, 0, -1, 7, 10] Output: 5
+ * 	Explanation: We need to sort only the subarray [1, 3, 2, 0, -1] to make the whole array sorted
+ * Input: [1, 2, 3] Output: 0
+ * 	Explanation: The array is already sorted
+ * Input: [3, 2, 1] Output: 3
+ * 	Explanation: The whole array needs to be sorted.
+ */ 
+fun minimumWindowSort(arr: IntArray): Int {
+    var min = Int.MAX_VALUE; var max = Int.MIN_VALUE
+    for(value in arr){
+        if(value < min) min = value
+        if(value > max) max = value
+    }
+    
+    var start = 0; var isMinSeen = false
+    while(start + 1 < arr.size){
+        if((isMinSeen == false && arr[start] > min) || arr[start] > arr[start + 1])
+        	break
+        if(arr[start] == min) isMinSeen = true
+        ++start
+    }
+    if(start + 1 >= arr.size) return 0 // list is sorted already
+    
+    var end = arr.size - 1; var isMaxSeen = false
+    while(end - 1 >= 0){
+        if((isMaxSeen == false && arr[end] > max) || arr[end] < arr[end - 1])
+        	break
+        if(arr[end] == max) isMaxSeen = true
+        --end
+    }
+    
+    println("start=${arr[start]} end=${arr[end]}")
+    return end - start + 1
+} 
+ 
+fun main() {
+   val result_1 = findTargetPairSorted(intArrayOf(2, 5, 9, 11), 11)
+   val result_2 = squareSortedArray(intArrayOf(-3, -1, 0, 1, 2))
+   val result_3 = findAllUniqueTriplets(intArrayOf(-5, 2, -1, -2, 3), 0)
+   val result_4 = findTripletCloseToTarget(intArrayOf(1, 0, 1, 1), 100)
+   val result_5 = countAllSmallerTriplets(intArrayOf(-1, 4, 2, 1, 3), 5)
+   val result_6 = findAllContiguousProduct(intArrayOf(8, 2, 6, 5), 50)
+   val result_7 = dutchNationalFlag(intArrayOf(2, 2, 0, 1, 2, 0))
+   
+   val prob_1 = findAllUniqueQuadruplets(intArrayOf(2, 0, -1, 1, -2, 2), 2)
+   val prob_2 = applyBackspaces("xywrrmp", "xywrrmu#p")
+   val prob_3 = minimumWindowSort(intArrayOf(3, 2, 1))
+   
+   println("Result for findTargetPair: $result_1")
+   println("Result for squaresortedArray: ${Arrays.toString(result_2)}")
+   println("Result for findAllUniqueTriplets: $result_3")
+   println("Result for findTripletCloseToTarget: $result_4")
+   println("Result for countAllSmallerTriplets: $result_5")
+   println("Result for findAllContiguousProduct: $result_6")
+   print("Result for dutchNationalFalag: [")
+   result_7.forEach { print("$it, ") }
+   println("]")
+   
+   println("\nResult for findAllUniqueQuadruplets: $prob_1")
+   println("Result for applyBackspaces: $prob_2")
+   println("Result for minimumWindowSort: $prob_3")
+}
