@@ -215,13 +215,34 @@ fun isAppointmentConflict(list: List<List<Int>>): Boolean {
  * Meetings: [[4,5], [2,3], [2,4], [3,5]] Output: 2
  * 	Explanation: We will need one room for [2,3] and [3,5], and another room for [2,4] and [4,5].
  */ 
-fun findMinRequiredRooms(list: List<List<Int>>): Int {
-    if(list.size == 0) return 0; if(list.size == 1) return 1;
-    var rooms = 1
-    val sorted = list.sortedWith(compareBy({it[1]}, {it[0]}))
-    println(sorted)
+fun findMinRequiredRooms(intervals: List<Pair<Int, Int>>): Int {
+    if(intervals.isEmpty()) return 0
+    else if(intervals.size == 1) return 1
     
-    return -1
+    val sortedIntervals = intervals.sortedBy{ it.first } 
+    
+    var minRooms = 1
+    val minHeap = PriorityQueue{ a: Pair<Int, Int>, b: Pair<Int, Int> -> a.second - b.second }
+    
+    for(interval in sortedIntervals){
+        println("Minimum Heap: $minHeap")
+        if(minHeap.isEmpty()){
+            minHeap.add(interval)
+            continue
+        }
+        
+        val meeting = minHeap.peek()
+        if(interval.first >= meeting.second)
+            minHeap.remove()
+        
+        minHeap.add(interval)
+        
+        // Keep track of the size of heap
+        if(minRooms < minHeap.size)
+        	minRooms = minHeap.size
+    }
+    
+    return minRooms
 }
  
 fun main() {
